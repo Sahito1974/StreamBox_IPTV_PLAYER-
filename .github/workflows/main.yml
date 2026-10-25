@@ -1,6 +1,6 @@
 YAML
 
-name: Build StreamBox IPTV Android APK
+name: Build StreamBox IPTV APK
 
 on:
   workflow_dispatch:
@@ -13,36 +13,24 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout source
+      - name: Download project
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Install Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install dependencies
+      - name: Install project packages
         run: npm install
 
-      - name: Build web application
+      - name: Build website
         run: npm run build
 
-      - name: Create Capacitor config if missing
+      - name: Create Android configuration
         run: |
-          if [ ! -f capacitor.config.ts ] && [ ! -f capacitor.config.json ]; then
-            cat > capacitor.config.json <<'EOF'
-          {
-            "appId": "com.streambox.iptv",
-            "appName": "StreamBox IPTV",
-            "webDir": "dist"
-          }
-          EOF
-          fi
-
-      - name: Create Android project
-        run: |
-          if [ ! -d android ]; then
-            npx cap add android
+          if [ ! -f capacitor.config.ts ] && [ ! -f capacitor.config.json ] && [ ! -f capacitor.config.js ]; then
+            npx cap init "StreamBox IPTV" "com.streambox.iptv" --web-dir dist
           fi
 
       - name: Set up Java
@@ -51,10 +39,13 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Set up Android SDK
+      - name: Install Android tools
         uses: android-actions/setup-android@v3
 
-      - name: Sync Capacitor
+      - name: Create Android app
+        run: npx cap add android
+
+      - name: Prepare Android app
         run: npx cap sync android
 
       - name: Build APK
@@ -63,9 +54,8 @@ jobs:
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Upload APK
+      - name: Save APK
         uses: actions/upload-artifact@v4
         with:
           name: StreamBox-IPTV-APK
           path: android/app/build/outputs/apk/debug/*.apk
-          if-no-files-found: error
