@@ -1,6 +1,6 @@
 YAML
 
-name: Build StreamBox IPTV APK
+name: StreamBox IPTV APK Build
 
 on:
   workflow_dispatch:
@@ -13,7 +13,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Download project
+      - name: Checkout project
         uses: actions/checkout@v4
 
       - name: Install Node.js
@@ -21,40 +21,33 @@ jobs:
         with:
           node-version: 20
 
-      - name: Install project packages
+      - name: Install packages
         run: npm install
 
-      - name: Build website
+      - name: Build StreamBox
         run: npm run build
 
-      - name: Create Android configuration
-        run: |
-          if [ ! -f capacitor.config.ts ] && [ ! -f capacitor.config.json ] && [ ! -f capacitor.config.js ]; then
-            npx cap init "StreamBox IPTV" "com.streambox.iptv" --web-dir dist
-          fi
-
-      - name: Set up Java
+      - name: Install Java
         uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: 21
 
-      - name: Install Android tools
+      - name: Install Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Create Android app
-        run: npx cap add android
-
-      - name: Prepare Android app
-        run: npx cap sync android
-
-      - name: Build APK
+      - name: Create Android project
         run: |
+          npx cap add android
+
+      - name: Build Android APK
+        run: |
+          npx cap sync android
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
 
-      - name: Save APK
+      - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: StreamBox-IPTV-APK
