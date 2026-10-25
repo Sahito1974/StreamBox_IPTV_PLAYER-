@@ -10,6 +10,7 @@ on:
 
 jobs:
   build:
+    name: Build Android APK
     runs-on: ubuntu-latest
 
     steps:
@@ -21,8 +22,14 @@ jobs:
         with:
           node-version: 20
 
+      - name: Check project files
+        run: |
+          echo "Checking project files..."
+          ls -la
+          test -f package.json || (echo "ERROR: package.json is missing" && exit 1)
+
       - name: Install dependencies
-        run: npm ci
+        run: npm install
 
       - name: Build web application
         run: npm run build
@@ -38,12 +45,18 @@ jobs:
 
       - name: Build Android APK
         run: |
+          if [ ! -f android/gradlew ]; then
+            echo "ERROR: Android project or android/gradlew is missing"
+            exit 1
+          fi
           cd android
           chmod +x gradlew
           ./gradlew assembleDebug
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: StreamBox-IPTV-APK
           path: android/app/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
