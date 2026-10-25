@@ -1,9 +1,12 @@
 YAML
 
-name: Build StreamBox Android APK
+name: Build StreamBox IPTV Android APK
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
 
 jobs:
   build:
@@ -19,9 +22,9 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
-      - name: Build web app
+      - name: Build web application
         run: npm run build
 
       - name: Set up Java
@@ -33,13 +36,7 @@ jobs:
       - name: Set up Android SDK
         uses: android-actions/setup-android@v3
 
-      - name: Add Android platform
-        run: npx cap add android
-
-      - name: Sync Android project
-        run: npx cap sync android
-
-      - name: Build debug APK
+      - name: Build Android APK
         run: |
           cd android
           chmod +x gradlew
@@ -48,5 +45,5 @@ jobs:
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
-          name: StreamBox-APK
-          path: android/app/build/outputs/apk/debug/app-debug.apk
+          name: StreamBox-IPTV-APK
+          path: android/app/build/outputs/apk/debug/*.apk
