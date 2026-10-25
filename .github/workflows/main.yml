@@ -1,24 +1,11 @@
 YAML
 
 name: StreamBox IPTV APK Build
-
-on:
-  workflow_dispatch:
-  push:
-    branches:
-      - main
+'on': [push, workflow_dispatch]
 
 jobs:
-  build:
+  test:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Check project files
-        run: ls -la
+      - uses: actions/checkout@v4
+      - run: echo "Workflow started successfully"
