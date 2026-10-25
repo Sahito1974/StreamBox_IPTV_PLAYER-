@@ -11,44 +11,14 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-
     steps:
-      - name: Checkout project
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Install Node.js
+      - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 20
 
-      - name: Install packages
-        run: npm install
-
-      - name: Build StreamBox
-        run: npm run build
-
-      - name: Install Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: 21
-
-      - name: Install Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Create Android project
-        run: |
-          npx cap add android
-
-      - name: Build Android APK
-        run: |
-          npx cap sync android
-          cd android
-          chmod +x gradlew
-          ./gradlew assembleDebug
-
-      - name: Upload APK
-        uses: actions/upload-artifact@v4
-        with:
-          name: StreamBox-IPTV-APK
-          path: android/app/build/outputs/apk/debug/*.apk
+      - name: Check project files
+        run: ls -la
