@@ -26,6 +26,9 @@ jobs:
       - name: Create Android project
         run: npx cap add android
 
+      - name: Sync web files to Android
+        run: npx cap sync android
+
       - name: Setup Java
         uses: actions/setup-java@v4
         with:
